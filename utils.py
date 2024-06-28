@@ -29,7 +29,7 @@ async def fetch(url, headers=None, data=None, method="POST"):
     async with aiohttp.ClientSession() as session:
         try:
             async with session.request(
-                method=method, url=url, data=data, headers=headers
+                    method=method, url=url, data=data, headers=headers
             ) as resp:
                 return await resp.json()
         except Exception as e:
@@ -39,6 +39,13 @@ async def fetch(url, headers=None, data=None, method="POST"):
 async def get_feed(ids, token):
     headers = {"Authorization": f"Bearer {token}"}
     api_url = f"{BASE_URL}/api/feed/?ids={ids}"
+    response = await fetch(api_url, headers, method="GET")
+    return response
+
+
+async def get_user_feed(token: str, page: int = 0):
+    headers = {"Authorization": f"Bearer {token}"}
+    api_url = f"{BASE_URL}/api/feed?page={page}"
     response = await fetch(api_url, headers, method="GET")
     return response
 

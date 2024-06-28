@@ -1,4 +1,7 @@
 [简体中文](README_ZH.md) | [日本語](README_JA.md)
+### Fork information
+
+This fork needed for individual purposes only. This fork API can support multiple sessions/
 
 ### Good news
 

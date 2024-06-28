@@ -49,7 +49,6 @@ def update_token(suno_cookie: SunoCookie):
         url=f"https://clerk.suno.com/v1/client/sessions/{session_id}/tokens?_clerk_js_version=4.72.0-snapshot.vc141245",
         headers=headers,
     )
-
     resp_headers = dict(resp.headers)
     set_cookie = resp_headers.get("Set-Cookie")
     suno_cookie.load_cookie(set_cookie)
@@ -74,4 +73,4 @@ def start_keep_alive(suno_cookie: SunoCookie):
     t.start()
 
 
-start_keep_alive(suno_auth)
+# start_keep_alive(suno_auth) # DISABLING DEFAULT UPDATING. This process will be on second backend
