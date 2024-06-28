@@ -19,7 +19,7 @@ class CustomModeGenerateParam(BaseModel):
     mv: str = Field(
         ...,
         description="model version, default: chirp-v3-0",
-        examples=["chirp-v3-0", "chirp-v3.5"],
+        examples=["chirp-v3-0", "chirp-v3-5"],
     )
     title: str = Field(..., description="song title")
     tags: str = Field(..., description="style of music")
