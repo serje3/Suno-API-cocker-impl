@@ -1,13 +1,13 @@
 # -*- coding:utf-8 -*-
 
-import json
+from typing import Annotated
 
 from fastapi import Depends, FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 import schemas
-from deps import get_token
-from utils import generate_lyrics, generate_music, get_feed, get_lyrics, get_credits, get_user_feed
+from utils import generate_lyrics, generate_music, get_feed, get_lyrics, get_credits, get_user_feed, PageQuery
 
 app = FastAPI()
 
@@ -19,6 +19,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+auth_scheme = HTTPBearer()
+
 
 @app.get("/")
 async def get_root():
@@ -27,10 +29,10 @@ async def get_root():
 
 @app.post("/generate")
 async def generate(
-        data: schemas.CustomModeGenerateParam, token: str = Depends(get_token)
+        data: schemas.CustomModeGenerateParam, token: HTTPAuthorizationCredentials = Depends(auth_scheme)
 ):
     try:
-        resp = await generate_music(data.dict(), token)
+        resp = await generate_music(data.dict(), token.credentials)
         return resp
     except Exception as e:
         raise HTTPException(
@@ -40,10 +42,10 @@ async def generate(
 
 @app.post("/generate/description-mode")
 async def generate_with_song_description(
-        data: schemas.DescriptionModeGenerateParam, token: str = Depends(get_token)
+        data: schemas.DescriptionModeGenerateParam, token: HTTPAuthorizationCredentials = Depends(auth_scheme)
 ):
     try:
-        resp = await generate_music(data.dict(), token)
+        resp = await generate_music(data.dict(), token.credentials)
         return resp
     except Exception as e:
         raise HTTPException(
@@ -52,9 +54,9 @@ async def generate_with_song_description(
 
 
 @app.get("/feed/{aid}")
-async def fetch_feed(aid: str, token: str = Depends(get_token)):
+async def fetch_feed(aid: str, token: HTTPAuthorizationCredentials = Depends(auth_scheme)):
     try:
-        resp = await get_feed(aid, token)
+        resp = await get_feed(aid, token.credentials)
         return resp
     except Exception as e:
         raise HTTPException(
@@ -63,9 +65,10 @@ async def fetch_feed(aid: str, token: str = Depends(get_token)):
 
 
 @app.get("/feed/")
-async def fetch_user_feed(token: str = Depends(get_token)):
+async def fetch_user_feed(page: Annotated[int | None, PageQuery] = 0,
+                          token: HTTPAuthorizationCredentials = Depends(auth_scheme)):
     try:
-        resp = await get_user_feed(token)
+        resp = await get_user_feed(token.credentials, page or 0)
         return resp
     except Exception as e:
         raise HTTPException(
@@ -74,7 +77,7 @@ async def fetch_user_feed(token: str = Depends(get_token)):
 
 
 @app.post("/generate/lyrics/")
-async def generate_lyrics_post(request: Request, token: str = Depends(get_token)):
+async def generate_lyrics_post(request: Request, token: HTTPAuthorizationCredentials = Depends(auth_scheme)):
     req = await request.json()
     prompt = req.get("prompt")
     if prompt is None:
@@ -83,7 +86,7 @@ async def generate_lyrics_post(request: Request, token: str = Depends(get_token)
         )
 
     try:
-        resp = await generate_lyrics(prompt, token)
+        resp = await generate_lyrics(prompt, token.credentials)
         return resp
     except Exception as e:
         raise HTTPException(
@@ -92,9 +95,9 @@ async def generate_lyrics_post(request: Request, token: str = Depends(get_token)
 
 
 @app.get("/lyrics/{lid}")
-async def fetch_lyrics(lid: str, token: str = Depends(get_token)):
+async def fetch_lyrics(lid: str, token: HTTPAuthorizationCredentials = Depends(auth_scheme)):
     try:
-        resp = await get_lyrics(lid, token)
+        resp = await get_lyrics(lid, token.credentials)
         return resp
     except Exception as e:
         raise HTTPException(
@@ -103,9 +106,9 @@ async def fetch_lyrics(lid: str, token: str = Depends(get_token)):
 
 
 @app.get("/get_credits")
-async def fetch_credits(token: str = Depends(get_token)):
+async def fetch_credits(token: HTTPAuthorizationCredentials = Depends(auth_scheme)):
     try:
-        resp = await get_credits(token)
+        resp = await get_credits(token.credentials)
         return resp
     except Exception as e:
         raise HTTPException(

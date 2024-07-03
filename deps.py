@@ -3,7 +3,6 @@ from typing import Annotated
 
 from fastapi import Header, HTTPException
 
-from cookie import suno_auth
 
 
 def get_token(authorization: Annotated[str | None, Header()] = None) -> str:

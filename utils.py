@@ -4,6 +4,7 @@ import time
 
 import aiohttp
 from dotenv import load_dotenv
+from fastapi import Query
 
 load_dotenv()
 
@@ -16,6 +17,8 @@ COMMON_HEADERS = {
     "Origin": "https://suno.com",
 }
 
+PageQuery = Query(ge=0)
+
 
 async def fetch(url, headers=None, data=None, method="POST"):
     if headers is None:
@@ -24,7 +27,10 @@ async def fetch(url, headers=None, data=None, method="POST"):
     if data is not None:
         data = json.dumps(data)
 
-    print(data, method, headers, url)
+    headers_for_print = {**headers}
+    headers_for_print['Authorization'] = f"Bearer *******"
+
+    print(data, method, headers_for_print, url)
 
     async with aiohttp.ClientSession() as session:
         try:
