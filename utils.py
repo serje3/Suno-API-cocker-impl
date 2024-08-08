@@ -3,6 +3,7 @@ import os
 import time
 
 import aiohttp
+from aiohttp import BasicAuth
 from dotenv import load_dotenv
 from fastapi import Query
 
@@ -35,7 +36,8 @@ async def fetch(url, headers=None, data=None, method="POST"):
     async with aiohttp.ClientSession() as session:
         try:
             async with session.request(
-                    method=method, url=url, data=data, headers=headers
+                    method=method, url=url, data=data, headers=headers, proxy=os.getenv("PROXY_URL"),
+                    proxy_auth=BasicAuth(os.getenv("PROXY_USER"), os.getenv("PROXY_PASS")),
             ) as resp:
                 return await resp.json()
         except Exception as e:
